@@ -1,5 +1,7 @@
 # Settle It !
 
+An application you can deploy on server to settle conflicts you have with friends (or enemies) through a head or tails or a rock-paper-scisors
+
 ## Developing
 
 Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
