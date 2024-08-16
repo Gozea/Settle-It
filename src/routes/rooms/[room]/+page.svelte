@@ -1,7 +1,7 @@
 <script>
     import { onDestroy } from 'svelte'
     import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator'
-    import { getRoomMembers, sendReady, sendType, sendStraw, joinTrigger, leaveTrigger, masterTrigger, memberReadyTrigger, resetReadyTrigger, gameTrigger, typeTrigger, gameInfoTrigger, gameResultTrigger } from '$lib/roommanager.js'
+    import { getRoomMembers, sendReady, sendType, sendChoice, joinTrigger, leaveTrigger, masterTrigger, memberReadyTrigger, resetReadyTrigger, gameTrigger, typeTrigger, gameInfoTrigger, gameResultTrigger } from '$lib/roommanager.js'
 
     // load
     export let data;
@@ -80,6 +80,16 @@
                     straws[resolve[1]].classList.remove("variant-filled-secondary")
                     break
                 case "rps":
+                    if(typeof(resolve)=='object') {
+                        console.log("object")
+                        if(resolve.includes(data.myId)) {
+                            console.log("lost")
+                            const rpsButton = document.querySelectorAll("#rps-button")
+                            rpsButton.forEach((btn)=>{
+                                btn.disabled=true
+                            })
+                        }
+                    }
                     break
                 default:
                     break
@@ -122,6 +132,11 @@
                           <path d="M15 8a6.97 6.97 0 0 0-1.71-4.584l-9.874 9.875A7 7 0 0 0 15 8M2.71 12.584l9.874-9.875a7 7 0 0 0-9.874 9.874ZM16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0"/>
                         </svg>
                     </button>
+                    <button type="button" class="btn-icon variant-filled-secondary" on:click={()=>sendType(room, "rps")}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+                        </svg>
+                    </button>
                 </div>
             {/if}
             {#if $typeTrigger == "coin"}
@@ -136,13 +151,19 @@
             {:else if $gameTrigger == "straw"}
                 <div>
                 {#each roomMembers as roomMember, i}
-                    <button id="straw" class="btn variant-filled-secondary" on:click={()=>{sendStraw(room, data.myId, i)}}>{i}</button>
+                    <button id="straw" class="btn variant-filled-secondary" on:click={()=>{sendChoice(room, data.myId, i, "straw")}}>{i}</button>
                 {/each}
                 </div>
                 {#if $gameResultTrigger}
                     <div class="h-full flex justify-center place-items-center">{$gameResultTrigger[0]}</div>
                 {/if}
             {:else if $gameTrigger == "rps"}
+                <button id="rps-button" class="btn variant-filled-secondary" on:click={()=>sendChoice(room, data.myId, "rock", "rps")}>Rock</button>
+                <button id="rps-button" class="btn variant-filled-secondary" on:click={()=>sendChoice(room, data.myId, "paper", "rps")}>Paper</button>
+                <button id="rps-button" class="btn variant-filled-secondary" on:click={()=>sendChoice(room, data.myId, "scissors", "rps")}>Scissors</button>
+                {#if typeof($gameResultTrigger)=='string'}
+                    <div class="h-full flex justify-center place-items-center">{$gameResultTrigger}</div>
+                {/if}
             {/if}
         </div>
     </div>

@@ -42,6 +42,9 @@ socket.on("all-member-ready", (game, info) => {
         case "straw":
             gameTrigger.set("straw")
             break
+        case "rps":
+            gameTrigger.set("rps")
+            break
         default:
             break
     }
@@ -64,6 +67,19 @@ socket.on("straw-picked", (member, straw) => {
 
 socket.on("last-straw", (losers, loserPicks) => {
     gameResultTrigger.set([losers, loserPicks])
+})
+
+socket.on("rps-picked", (member) => {
+    gameInfoTrigger.set(member)
+})
+
+socket.on("rps-round", (losers) => {
+    gameResultTrigger.set(losers)
+})
+
+socket.on("rps-winner", (winner) => {
+    console.log("winner : ", winner)
+    gameResultTrigger.set(winner)
 })
 
 // emitters
@@ -134,9 +150,9 @@ export async function sendType(roomName, game) {
     })
 }
 
-export async function sendStraw(roomName, roomMember, strawPick) {
+export async function sendChoice(roomName, roomMember, choice, game) {
     return new Promise((resolve, reject) => {
-        socket.emit("send-straw", roomName, roomMember, strawPick, (response) => {
+        socket.emit(`send-${game}`, roomName, roomMember, choice, (response) => {
             if (response) return resolve(response)
             else reject(new Error("No response"))
         })

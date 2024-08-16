@@ -85,7 +85,6 @@ function changeType(roomName: string, game: string, io) {
     }
 }
 
-
 function setMemberReady(roomName: string, socket, io): string {
     rooms.get(roomName).get("members").get(socket.id).set("ready", 1)
     io.sockets.to(roomName).emit("member-ready", socket.id)
@@ -109,6 +108,7 @@ function gameReady(roomName: string, allAgreement: bool, io) {
                 io.to(roomName).emit("all-member-ready", "straw", "")
                 break
             case "rps":
+                io.to(roomName).emit("all-member-ready", "rps", "")
                 break
             default:
                 break
@@ -138,6 +138,59 @@ function lastStraw(roomName: string, allPicked: bool, io) {
     }
 }
 
+function pickRPS(roomName, roomMember, choice, io) {
+    if(!rooms.get(roomName).get("members").get(roomMember).get("choice")) {
+        rooms.get(roomName).get("members").get(roomMember).set("choice", choice)
+        io.sockets.to(roomName).emit("rps-picked", roomMember)
+        let allPicked = true
+        rooms.get(roomName).get("members").forEach((memberInfo, member) => {
+            if (!memberInfo.get("choice")) allPicked = false
+        })
+        resolveRPS(roomName, allPicked, io)
+    }
+}
+
+function resolveRPS(roomName, allPicked, io) {
+    if(allPicked) {
+        let picks = new Set()
+        rooms.get(roomName).get("members").forEach((memberInfo, member) => {
+            if (memberInfo.get("choice")!="eliminated") picks.add(memberInfo.get("choice"))
+        })
+        if (picks.size==3 || picks.size==1) {
+            rooms.get(roomName).get("members").forEach((memberInfo, member) => {
+                 if (memberInfo.get("choice")!="eliminated") memberInfo.delete("choice")
+            }) 
+            io.to(roomName).emit("rps-round", [])
+        } else {
+           let losePick
+           let losers = []
+           if (picks.has("rock") && picks.has("paper")) losePick = "rock"
+           if (picks.has("rock") && picks.has("scissors")) losePick = "scissors"
+           if (picks.has("paper") && picks.has("scissors")) losePick = "paper"
+           console.log("losepick : ", losePick)
+           rooms.get(roomName).get("members").forEach((memberInfo, member) => {
+                if (memberInfo.get("choice")==losePick ||memberInfo.get("choice")=="eliminated") { 
+                    console.log("lost : ", member)
+                    memberInfo.set("choice", "eliminated")
+                    losers.push(member)
+                } else {
+                    memberInfo.delete("choice")
+                }
+           }) 
+           io.to(roomName).emit("rps-round", losers)
+        }
+        // check if only one player left
+        let leftPlayers = 0
+        let lastPlayer = "lastPlayer"
+        rooms.get(roomName).get("members").forEach((memberInfo, member) => {
+            if (memberInfo.get("choice") != "eliminated") {
+                leftPlayers += 1
+                lastPlayer = member
+            }
+        })
+        if (leftPlayers == 1) io.to(roomName).emit("rps-winner", lastPlayer)
+    }
+}
 
 export const webSocketServer = {
     name: 'webSocketServer',
@@ -179,6 +232,12 @@ export const webSocketServer = {
                 console.log(rooms)
                 console.log(roomName, " : ", rooms.get(roomName).get("members"))
                 callback("straw-picked")
+            })
+            socket.on("send-rps", (roomName, roomMember, choice, callback) => {
+                pickRPS(roomName, roomMember, choice, io)
+                console.log(rooms)
+                console.log(roomName, " : ", rooms.get(roomName).get("members"))
+                callback(`${choice}-picked`)
             })
 
             socket.on("disconnect", () => {
