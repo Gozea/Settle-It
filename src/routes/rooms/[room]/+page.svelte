@@ -102,14 +102,14 @@
 
 
 <div class="h-full p-8">
-    <div class="card h-full grid grid-rows-4 p-4">
-        <div class="grid grid-flow-col space-x-4">
+    <div class="card h-full flex p-4">
+        <div class="flex flex-col">
             {#each roomMembers as roomMember}
-                <div id="{roomMember}" class="card grid place-items-center">
+                <div id="{roomMember}" class="card flex place-items-center justify-center space-x-4 p-4">
                     {#if $masterTrigger == roomMember}
-                        <div class="badge-icon">Master</div>
+                        <div>Master</div>
                     {/if}
-                    <header class="card-header">{roomMember}</header>
+                    <div>{roomMember}</div>
                     {#if roomMember == data.myId}
                         <button class="btn variant-filled-tertiary" on:click={()=>sendReady(room)}>Ready</button>
                     {/if}
@@ -117,7 +117,7 @@
                 </div>
             {/each}
         </div>
-        <div class="card row-span-3 my-4 p-4">
+        <div class="card flex-1 flex-col justify-center p-4">
             {#if isMaster}
                 <div class="flex justify-center">
                     <button type="button" class="btn-icon variant-filled-secondary" on:click={()=>sendType(room, "coin")}>
@@ -158,9 +158,11 @@
                     <div class="h-full flex justify-center place-items-center">{$gameResultTrigger[0]}</div>
                 {/if}
             {:else if $gameTrigger == "rps"}
-                <button id="rps-button" class="btn variant-filled-secondary" on:click={()=>sendChoice(room, data.myId, "rock", "rps")}>Rock</button>
-                <button id="rps-button" class="btn variant-filled-secondary" on:click={()=>sendChoice(room, data.myId, "paper", "rps")}>Paper</button>
-                <button id="rps-button" class="btn variant-filled-secondary" on:click={()=>sendChoice(room, data.myId, "scissors", "rps")}>Scissors</button>
+                <div class="flex justify-center">
+                    <button id="rps-button" class="btn variant-filled-secondary" on:click={()=>sendChoice(room, data.myId, "rock", "rps")}>Rock</button>
+                    <button id="rps-button" class="btn variant-filled-secondary" on:click={()=>sendChoice(room, data.myId, "paper", "rps")}>Paper</button>
+                    <button id="rps-button" class="btn variant-filled-secondary" on:click={()=>sendChoice(room, data.myId, "scissors", "rps")}>Scissors</button>
+                </div>
                 {#if typeof($gameResultTrigger)=='string'}
                     <div class="h-full flex justify-center place-items-center">{$gameResultTrigger}</div>
                 {/if}
