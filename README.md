@@ -34,6 +34,5 @@ You can preview the production build with `npm run preview`.
 - in-room topics
 - custom names
 - in-room chat
-- better UI
 - password for rooms
 - other game modes ?
