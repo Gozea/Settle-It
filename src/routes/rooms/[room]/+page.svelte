@@ -118,6 +118,7 @@
             {/each}
         </div>
         <div class="card flex-1 flex-col justify-center p-4">
+
             {#if isMaster}
                 <div class="flex justify-center">
                     <button type="button" class="btn-icon variant-filled-secondary" on:click={()=>sendType(room, "coin")}>
@@ -139,6 +140,7 @@
                     </button>
                 </div>
             {/if}
+
             {#if $typeTrigger == "coin"}
                 <div class="h3 flex justify-center">Head or Tails</div>
             {:else if $typeTrigger == "straw"}
@@ -146,8 +148,9 @@
             {:else}
                 <div class="h3 flex justify-center">RPS</div>
             {/if}
+
             {#if $gameTrigger == "coin"}
-                <div class="h-full flex justify-center place-items-center">{$gameInfoTrigger}</div>
+                <div class="flex justify-center place-items-center">{$gameResultTrigger}</div>
             {:else if $gameTrigger == "straw"}
                 <div>
                 {#each roomMembers as roomMember, i}
@@ -155,7 +158,7 @@
                 {/each}
                 </div>
                 {#if $gameResultTrigger}
-                    <div class="h-full flex justify-center place-items-center">{$gameResultTrigger[0]}</div>
+                    <div class="flex justify-center place-items-center">{$gameResultTrigger[0]}</div>
                 {/if}
             {:else if $gameTrigger == "rps"}
                 <div class="flex justify-center">
@@ -164,9 +167,14 @@
                     <button id="rps-button" class="btn variant-filled-secondary" on:click={()=>sendChoice(room, data.myId, "scissors", "rps")}>Scissors</button>
                 </div>
                 {#if typeof($gameResultTrigger)=='string'}
-                    <div class="h-full flex justify-center place-items-center">{$gameResultTrigger}</div>
+                    <div class="flex justify-center place-items-center">{$gameResultTrigger}</div>
                 {/if}
             {/if}
+
+            {#if $gameResultTrigger}
+                <button class="btn-icon variant-filled-secondary" on:click={()=>sendType(room, $typeTrigger)}>Restart</button>
+            {/if}
+
         </div>
     </div>
 </div>

@@ -36,8 +36,8 @@ socket.on("all-member-ready", (game, info) => {
     switch(game) {
         case "coin":
             gameTrigger.set("coin")
-            if (info == 0) gameInfoTrigger.set("head")
-            else gameInfoTrigger.set("tail")
+            if (info == 0) gameResultTrigger.set("head")
+            else gameResultTrigger.set("tail")
             break
         case "straw":
             gameTrigger.set("straw")
@@ -72,7 +72,7 @@ socket.on("last-straw", (losers, loserPicks) => {
 socket.on("rps-picked", (member) => {
     gameInfoTrigger.set(member)
 })
-
+/
 socket.on("rps-round", (losers) => {
     gameResultTrigger.set(losers)
 })
